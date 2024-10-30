@@ -1,72 +1,56 @@
 import React, { useState } from "react";
-import axios from "axios";
+import { applyForLoan } from "../services/loanService";
 
 const LoanForm = () => {
-  const [loanData, setLoanData] = useState({
-    loanType: "",
-    amount: "",
-    tenure: "",
-  });
-
-  const handleChange = (e) => {
-    setLoanData({
-      ...loanData,
-      [e.target.name]: e.target.value,
-    });
-  };
+  const [loanType, setLoanType] = useState("");
+  const [amount, setAmount] = useState("");
+  const [tenure, setTenure] = useState("");
+  const [message, setMessage] = useState("");
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      const response = await axios.post("/api/loans/apply", loanData);
-      console.log("Loan Applied: ", response.data);
+      await applyForLoan({ loanType, amount, tenure });
+      setMessage("Loan application submitted successfully!");
     } catch (error) {
-      console.error("Error applying for loan", error);
+      setMessage("Failed to submit loan application. Please try again.");
     }
   };
 
   return (
-    <div className="bg-white p-6 rounded-lg shadow-md">
-      <h2 className="text-2xl font-bold mb-4">Apply for a Loan</h2>
-      <form onSubmit={handleSubmit}>
-        <div className="mb-4">
-          <label className="block text-gray-700">Loan Type</label>
-          <input
-            type="text"
-            name="loanType"
-            value={loanData.loanType}
-            onChange={handleChange}
-            className="w-full px-3 py-2 border border-gray-300 rounded-md"
-            placeholder="Enter loan type"
-          />
-        </div>
-        <div className="mb-4">
-          <label className="block text-gray-700">Amount</label>
-          <input
-            type="number"
-            name="amount"
-            value={loanData.amount}
-            onChange={handleChange}
-            className="w-full px-3 py-2 border border-gray-300 rounded-md"
-            placeholder="Enter amount"
-          />
-        </div>
-        <div className="mb-4">
-          <label className="block text-gray-700">Tenure (months)</label>
-          <input
-            type="number"
-            name="tenure"
-            value={loanData.tenure}
-            onChange={handleChange}
-            className="w-full px-3 py-2 border border-gray-300 rounded-md"
-            placeholder="Enter tenure"
-          />
-        </div>
+    <div className="bg-white shadow-md rounded px-8 pt-6 pb-8 mb-4 w-80">
+      <h2 className="text-2xl font-bold text-center mb-5">Apply for a Loan</h2>
+      {message && <p className="text-green-500 text-center">{message}</p>}
+      <form onSubmit={handleSubmit} className="flex flex-col">
+        <input
+          type="text"
+          placeholder="Loan Type"
+          value={loanType}
+          onChange={(e) => setLoanType(e.target.value)}
+          required
+          className="mb-4 px-3 py-2 border rounded"
+        />
+        <input
+          type="number"
+          placeholder="Amount"
+          value={amount}
+          onChange={(e) => setAmount(e.target.value)}
+          required
+          className="mb-4 px-3 py-2 border rounded"
+        />
+        <input
+          type="number"
+          placeholder="Tenure (months)"
+          value={tenure}
+          onChange={(e) => setTenure(e.target.value)}
+          required
+          className="mb-6 px-3 py-2 border rounded"
+        />
         <button
           type="submit"
-          className="w-full bg-blue-500 text-white py-2 px-4 rounded-md hover:bg-blue-700"
+          className="bg-blue-500 text-white py-2 rounded font-semibold hover:bg-blue-600"
         >
-          Submit Loan Application
+          Apply
         </button>
       </form>
     </div>
